@@ -6,18 +6,44 @@
 
 int main()
 {
-    enum class items {
-        stick1, stick2, stick3, stick4
+    enum item_id { stick, sword, rubin };
+
+    struct items {
+        item_id id;        
+        std::string name;
+        int dmgup;
+        int hpup;
     };
+
+    enum enemies_id { slime, bat };
+
+    struct enemies{
+        enemies_id id;
+        std::string name;
+        int hp;
+        int dmg;
+    }enemy[2];
+
+    /*struct {
+        std::string name;
+        int hp;
+        int dmg;
+    } enemy[2];*/
+
+    enemy[0].dmg = 3;
+    enemy[0].hp = 3;
+
+    enemy[1].dmg = 1;
+    enemy[1].hp = 3;
 
     struct {
         std::string name;
-    } item[4];
-
-    item[0].name = "stick1";
+    } item[3];
+        
+    /*item[0].name = "stick1";
     item[1].name = "stick2";
     item[2].name = "stick3";
-    item[3].name = "stick4";
+    item[3].name = "stick4";*/
 
      
     struct {
@@ -25,30 +51,37 @@ int main()
         std::string name;
         std::vector<int> door;
         std::vector<items> loot;
+        std::vector<enemies> enemy;
     } location[4];
 
     location[0].name = "home";
     location[0].door.push_back(1);
-    location[0].loot.push_back(items::stick2);
 
     location[1].name = "forest";
     location[1].id = 1;
     location[1].door.push_back(0);
     location[1].door.push_back(2);
     location[1].door.push_back(3);
-    location[1].loot.push_back(items::stick1);
-    location[1].loot.push_back(items::stick3);
+    location[1].loot.push_back({ item_id::stick,"stick "});
 
     location[2].name = "cave";
     location[2].door.push_back(1);
-    location[2].loot.push_back(items::stick3);
-    location[2].loot.push_back(items::stick3);
+    location[2].loot.push_back({ item_id::sword,"sword ",2,0 });
+    location[2].enemy.push_back({ enemies_id::bat,"bat",2,1 });
 
     location[3].name = "swamp";
     location[3].door.push_back(1);
+    location[3].loot.push_back({ item_id::rubin,"rubin ",0,10 });
+    location[3].enemy.push_back({ enemies_id::slime,"slime",5,3 });
+
+    struct {
+        std::string name;
+    }inventory;
 
     struct {
         int pos;
+        int hp;
+        int dmg;
         std::vector<int> inventory;
     } player;
 
@@ -60,62 +93,110 @@ int main()
     //e = location->id;
 
     player.pos = 0;
+    player.hp = 20;
+    player.dmg = 1;
 
-    while (true) {
-        std::cout << "current location: " << location[player.pos].name << "\n";
-        std::cout << "your action:\n" << "1.open inventory " << "2.items around " << "3.go to location " << "\n";
-        std::cin >> act;
-        if (act == 2) {
-            if (location[player.pos].loot.size() > 0) {
-                for (int c = 0; c < location[player.pos].loot.size(); c++) {
-                    std::cout << item->name << "\n";
-                }
-                std::cout << "your action:\n" << "1.pick up " << "2.leave ";
-                std::cin >> invact;
-                if (invact == 1) {
+    int enemy_hp;
+    int enemy_dmg = 0;
+
+            while (true) {
+                
+                for (int i = 0; i < location[player.pos].enemy.size(); i++)
+                {
+                    std::cout << "enemy: " << location[player.pos].enemy[i].name << "\n";
                     
-                    //l -= 1;
-                    //player.inventory + item->name;
+                    while (location[player.pos].enemy[i].hp > 0) {
+                        if (player.hp <= 0) {                            
+                            break;
+                        }
+                        std::cout << "your stats: " << "hp: " << player.hp << " dmg: " << player.dmg << "\n";
+                        std::cout << "enemy stats: " << "hp: " << location[player.pos].enemy[i].hp << " dmg: " << location[player.pos].enemy[i].dmg << "\n";
+                        std::cout << "your next move:\n" << "1.atack " << "2.defence " << "\n";
+                        std::cin >> invact;
+                        if (invact == 1) {
+                            location[player.pos].enemy[i].hp -= player.dmg;
+                            player.hp -= location[player.pos].enemy[i].dmg;
+                        }
+                        if (invact == 2) {
+                            player.hp -= (location[player.pos].enemy[i].dmg-1);
+                        }
+                    }         
                 }
-            }
-            else {
-                std::cout << "nothing here\n";
-            }
-        }
 
-        if (act == 3) {
-            std::cout << "choose location:\n";
+                std::cout << "current location: " << location[player.pos].name << "\n";
+                std::cout << "your stats: \n" << "hp: " << player.hp << "\n" << "dmg: " << player.dmg << "\n";
+                //std::cout << "your equip: " <<  << "\n";                                
+                   
+               
 
-            for (int i = 0; i < location[player.pos].door.size(); i++)
-            {
-                int dst = location[player.pos].door[i];
-                std::cout << location[dst].name << "\n";
+                if (player.hp <= 0) {
+                    std::cout << "game over! \n";
+                    break;
+                }
+                
+                std::cout << "your action:\n" << "1.inventory " << "2.items around " << "3.go to location " << "\n";
 
-            }
+                std::cin >> act;
+                
+                if (act == 1) {
+                    for (int c = 0; c < inventory.name.size(); c++) {
+                        std::cout << inventory.name << "\n";
+                    }                        
+                }
 
-            
-            bool is_ok = false;
-            while (is_ok == false) {
-                std::cin >> locact;
-                for (int i = 0; i < location[player.pos].door.size(); i++) {
+                if (act == 2) {
+                    if (location[player.pos].loot.size() > 0) {
+                        for (int c = 0; c < location[player.pos].loot.size(); c++) {
+                            std::cout << location[player.pos].loot[c].name << "\n";
 
-                    int dst = location[player.pos].door[i];
-
-                    if (locact == location[dst].name)
-                    {
-                        player.pos = dst;
-                        is_ok = true;
-                        
+                            std::cout << "your action:\n" << "1.pick up " << "2.leave ";
+                            std::cin >> invact;
+                            if (invact == 1) {
+                                inventory.name += location[player.pos].loot[c].name;
+                                player.dmg += location[player.pos].loot[c].dmgup;
+                                player.hp += location[player.pos].loot[c].hpup;
+                            }
+                        }
+                    }
+                    else {
+                        std::cout << "nothing here\n";
                     }
                 }
 
-                if (!is_ok) {
-                    std::cout << "wrong name \n";
+                if (act == 3) {
+                    std::cout << "choose location:\n";
+
+                    for (int i = 0; i < location[player.pos].door.size(); i++)
+                    {
+                        int dst = location[player.pos].door[i];
+                        std::cout << location[dst].name << "\n";
+                        
+                    }
+
+
+                    bool is_ok = false;
+                    while (is_ok == false) {
+                        std::cout << "go to: ";
+                        std::cin >> locact;
+                        for (int i = 0; i < location[player.pos].door.size(); i++) {
+
+                            int dst = location[player.pos].door[i];
+
+                            if (locact == location[dst].name)
+                            {
+                                player.pos = dst;
+                                is_ok = true;
+
+                            }
+                        }
+
+                        if (!is_ok) {
+                            std::cout << "wrong name \n";
+                        }
+                    }
+
                 }
             }
-
-        }
-    }
     
 }
 
