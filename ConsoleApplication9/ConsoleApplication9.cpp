@@ -5,7 +5,11 @@
 #include <vector>
 
 int main()
-{
+{       
+    std::vector<int> a{1,2,3};
+    a.erase(a.begin()+1);
+    
+
     enum item_id { stick, sword, rubin };
 
     struct items {
@@ -82,7 +86,7 @@ int main()
         int pos;
         int hp;
         int dmg;
-        std::vector<int> inventory;
+        std::vector<items> inventory;
     } player;
 
 
@@ -103,12 +107,14 @@ int main()
                 
                 for (int i = 0; i < location[player.pos].enemy.size(); i++)
                 {
-                    std::cout << "enemy: " << location[player.pos].enemy[i].name << "\n";
+                    
+                    //std::cout << "enemy: " << location[player.pos].enemy[i].name << "\n";
                     
                     while (location[player.pos].enemy[i].hp > 0) {
                         if (player.hp <= 0) {                            
                             break;
                         }
+                        std::cout << "enemy: " << location[player.pos].enemy[i].name << "\n";
                         std::cout << "your stats: " << "hp: " << player.hp << " dmg: " << player.dmg << "\n";
                         std::cout << "enemy stats: " << "hp: " << location[player.pos].enemy[i].hp << " dmg: " << location[player.pos].enemy[i].dmg << "\n";
                         std::cout << "your next move:\n" << "1.atack " << "2.defence " << "\n";
@@ -139,8 +145,13 @@ int main()
                 std::cin >> act;
                 
                 if (act == 1) {
-                    for (int c = 0; c < inventory.name.size(); c++) {
-                        std::cout << inventory.name << "\n";
+                    if (player.inventory.size() == 0) {
+                        std::cout << "empty \n";
+                    }
+                    else
+                        std::cout << "your items: \n";
+                    for (int c = 0; c < player.inventory.size(); c++) {
+                        std::cout << player.inventory[c].name << "\n";
                     }                        
                 }
 
@@ -152,9 +163,11 @@ int main()
                             std::cout << "your action:\n" << "1.pick up " << "2.leave ";
                             std::cin >> invact;
                             if (invact == 1) {
-                                inventory.name += location[player.pos].loot[c].name;
+                                player.inventory.push_back({ location[player.pos].loot[c] });
+
                                 player.dmg += location[player.pos].loot[c].dmgup;
                                 player.hp += location[player.pos].loot[c].hpup;
+                                location[player.pos].loot.erase(location[player.pos].loot.begin());
                             }
                         }
                     }
